@@ -1,0 +1,153 @@
+<html><head>
+    <title>p5.js Simple Joystick</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <script src="p5.js"></script>
+    <script src="p5.dom.min.js"></script>
+    <script src="p5.play.js"></script>
+    <script src="p5.sound.min.js"></script>
+
+    <style>
+      canvas {
+        position: absolute;
+      }
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body cz-shortcut-listen="true" onresize="location.reload()">
+    <script>
+      var fire = new Audio("fire.mp3");
+        function preload(){
+            z_l=loadImage("zom left.png");
+            man_i=loadImage("man.png");
+            aimi=loadImage("https://image.flaticon.com/icons/png/512/473/473409.png")
+            guni=loadImage("guni.png")
+            peoplei=loadImage("people.png");
+        }
+      let sprite_x;
+      let sprite_y;
+      const sprite_size = 50;
+      let jx;
+      let jy;
+      let jr;
+      var zomgr=[];
+      var health =100
+
+      const max_jump_height = 30;
+      let moving_vertically = false;
+      var width = document.body.clientWidth;
+      var height = document.body.clientHeight;
+     
+      function setup() {
+        createCanvas(document.body.clientWidth, document.body.clientHeight);
+        sprite_x = 50;
+        sprite_y = 50;
+        jx = (width /3.35)*3;
+        jy = (height / 3.5) * 3;
+        jr = height / 7.5;
+        player = createSprite(width/4,height-50,0,0);
+        player.addImage(man_i);
+        player.scale=(width/height)/2.35;
+        aim = createSprite(player.x+width/4,player.y-20,40,40);
+        aim.addImage(aimi);
+        aim.scale=(width/height)/16.789;
+        gun = createSprite(jx,jy,2*jr);
+        gun.addImage(guni);
+        gun.scale=(width/height)/7.75;
+        people=createSprite(50,height,0,0);
+        people.addImage(peoplei)
+        people.scale=(width/height)/4.5;
+        people.setCollider("rectangle",0,0,350,500);
+        bar = createSprite(85,70,150,30);
+        bar.shapeColor="green";
+        frameRate(120);
+      }
+      function draw() {
+        
+        dist=(jx+jr)-player.x;
+        aim.setCollider("circle",0,0,aim.width/2.5);
+        if(health>0){
+        bar.width=health*1.675;
+        bar.x=bar.width/2+10;
+        }
+        else{
+          bar.destroy();
+        }
+        background("rgb(100,100,50)");
+        drawSprites();
+        if(health>50){
+          bar.shapeColor="green"
+        }
+        else if(health>30){
+          bar.shapeColor="orange"
+        }
+        else if(health>0){
+          bar.shapeColor="gold"
+        }
+        
+
+        push();
+        strokeWeight(4);
+        fill("rgb(255,75,75)")
+        aim.x=player.x+width/3
+        aim.y=player.y-20
+        for(var i=0;i<touches.length;i++){
+          if(touches[i].x<(gun.x-50)){
+            circle(touches[i].x-20,touches[i].y+20,height/8);
+            if(touches.length>0){
+            player.y=(touches[i].y);
+            player.x=(touches[i].x);   
+            }
+          }
+          else{
+      shootbl();
+      fire.play()
+          }
+          }
+        pop();
+        enemyattack();
+        for(var j=0;j<zomgr.length;j++){
+            zom=zomgr[j]
+            if(zom.isTouching(player)){
+              health-=10;
+              zom.destroy();
+            }
+          }
+          
+          textSize(30)
+          stroke("red")
+        fill("magenta");
+        strokeWeight(2.5);
+        text("Health: "+health,10,40);
+        strokeWeight(4);
+        stroke("black")
+          fill("rgba(0,0,0,0)");
+          rect(10,55,170,30);
+
+      }
+    
+      function enemyattack(){
+        if(frameCount%100===0){
+          zombie = createSprite(random(width,width-(width/5)),random(height/5,20),0,0)
+          zombie.addImage(z_l);
+          zombie.scale=(width/height)/6.24;
+          zombie.velocityX=-0.7;
+          zombie.velocityY=0.45;
+          zomgr.push(zombie);
+        }
+      }
+      function shootbl(){
+        for(var j=0;j<zomgr.length;j++){
+            zom=zomgr[j]
+            if(zom.isTouching(aim)){
+              zom.destroy()
+            }
+          }
+      }
+    </script>
+  
+
+</body>
+</html>
